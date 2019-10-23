@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Author: Dreamer-1
+ * Author: yangpan
  * Date: 2019-03-01
  * Time: 11:09
  * Description: 生成Excel并写入数据
@@ -73,7 +73,8 @@ public class ExcelWriter {
         // 生成Sheet表，写入第一行的列头
         Sheet sheet = buildDataSheet(workbook);
         //构建每行的数据内容
-        int rowNum = 1;
+        int rowNum = CELL_HEADS.size() == 0 ? 0 : 1;
+
         for (Iterator<List<String>> it = dataList.iterator(); it.hasNext(); ) {
             List<String> data = it.next();
             if (data == null) {
@@ -94,6 +95,9 @@ public class ExcelWriter {
      */
     private static Sheet buildDataSheet(Workbook workbook) {
         Sheet sheet = workbook.createSheet();
+        if (CELL_HEADS.size() == 0) {
+            return sheet;
+        }
         // 设置列头宽度
         for (int i = 0; i < CELL_HEADS.size(); i++) {
             sheet.setColumnWidth(i, 4000);

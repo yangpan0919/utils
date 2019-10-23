@@ -1,7 +1,7 @@
 package com.study.utils.excel;
 
 /**
- * Author: Dreamer-1
+ * Author: yangpan
  * Date: 2019-03-01
  * Time: 11:33
  * Description: 读取Excel时，封装读取的每一行的数据

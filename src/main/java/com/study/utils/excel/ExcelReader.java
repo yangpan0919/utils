@@ -17,7 +17,7 @@ import java.util.*;
 import java.util.logging.Logger;
 
 /**
- * Author: Dreamer-1
+ * Author: yangpan
  * Date: 2019-03-01
  * Time: 10:21
  * Description: 读取Excel内容
@@ -28,6 +28,7 @@ public class ExcelReader {
 
     private static final String XLS = "xls";
     private static final String XLSX = "xlsx";
+    private static final boolean needHead = true; //是否需要表头
 
     /**
      * 根据文件后缀名类型获取对应的工作簿对象
@@ -253,7 +254,14 @@ public class ExcelReader {
             }
 
             // 解析每一行的数据，构造数据对象
-            int rowStart = firstRowNum + 1;
+            int rowStart;
+
+            if (needHead) {
+                rowStart = firstRowNum;
+            } else {
+                rowStart = firstRowNum + 1;
+            }
+
             int rowEnd = sheet.getPhysicalNumberOfRows();
             for (int rowNum = rowStart; rowNum < rowEnd; rowNum++) {
                 Row row = sheet.getRow(rowNum);
