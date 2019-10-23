@@ -20,10 +20,15 @@ public class zhu {
         File[] peopleFile = file.listFiles(); //每个人的文件夹
         for (File peopleDir : peopleFile) {
             String peopleName = peopleDir.getName();
+            if (peopleDir.isFile()) {
+                System.out.println(peopleName + ":不是文件夹");
+            }
             File[] files = peopleDir.listFiles(); //每个人下面的文件夹
             for (File dirFile : files) {
                 String dirFileName = dirFile.getName();  //每个具体的文件夹名
-//                dirFiles.add(dirFileName);
+                if (dirFile.isFile()) {
+                    System.out.println(dirFileName + ":不是文件夹");
+                }
                 File[] excelFiles = dirFile.listFiles();
                 for (File targetFile : excelFiles) {
                     String targetFileName = targetFile.getName();
