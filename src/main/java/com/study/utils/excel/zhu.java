@@ -13,7 +13,7 @@ public class zhu {
 
     public static void main(String[] args) {
         Map<String, List<List<String>>> map = new HashMap();
-        String path = "C:\\Users\\Administrator\\Desktop\\zwhtest"; //目录文件夹
+        String path = "C:\\Users\\Administrator\\Desktop\\zwh"; //目录文件夹
 //        Set<String> dirFiles = new HashSet<>();
 
         File file = new File(path);
@@ -39,7 +39,7 @@ public class zhu {
                         map.put(key, new ArrayList<>());
                     }
                     String absolutePath = targetFile.getAbsolutePath();
-                    List<List<String>> lists = ExcelReader.readExcelForStr(absolutePath);
+                    List<List<String>> lists = ExcelReader.readExcelForStr(absolutePath,key);
                     map.get(key).addAll(lists);
                 }
             }
@@ -53,7 +53,7 @@ public class zhu {
             int i = string.indexOf(point);
             String s = outPath + "\\" + string.substring(0, i) + "\\";
             s = s + string.substring(i + point.length()) + ".xlsx";
-            export(lists, s);
+            export(lists, s,string);
         }
 
 
@@ -89,8 +89,8 @@ public class zhu {
     }
 
 
-    public static void export(List<List<String>> lists, String exportFilePath) {
-        Workbook workbookStr = ExcelWriter.exportDataForStr(lists);
+    public static void export(List<List<String>> lists, String exportFilePath,String key) {
+        Workbook workbookStr = ExcelWriter.exportDataForStr(lists,key);
 
         // 以文件的形式输出工作簿对象
         FileOutputStream fileOut = null;

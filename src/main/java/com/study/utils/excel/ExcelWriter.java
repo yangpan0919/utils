@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import static com.study.utils.excel.ExcelReader.convertCellValueToString;
+
 /**
  * Author: yangpan
  * Date: 2019-03-01
@@ -22,10 +24,10 @@ public class ExcelWriter {
     static {
         // 类装载时就载入指定好的列头信息，如有需要，可以考虑做成动态生成的列头
         CELL_HEADS = new ArrayList<>();
-        CELL_HEADS.add("姓名");
-        CELL_HEADS.add("年龄");
-        CELL_HEADS.add("居住城市");
-        CELL_HEADS.add("职业");
+//        CELL_HEADS.add("姓名");
+//        CELL_HEADS.add("年龄");
+//        CELL_HEADS.add("居住城市");
+//        CELL_HEADS.add("职业");
     }
 
     /**
@@ -63,17 +65,27 @@ public class ExcelWriter {
      * @param dataList 数据列表
      * @return 写入数据后的工作簿对象
      */
-    public static Workbook exportDataForStr(List<List<String>> dataList) {
-        // 生成xlsx的Excel
-        Workbook workbook = new SXSSFWorkbook();
+    public static Workbook exportDataForStr(List<List<String>> dataList, String key) {
+        Workbook workbook = null;
+        Sheet sheet = null;
+        if (ExcelReader.headType == 2) {
+            //获取已有的Excel表格,由于是合并excel，内容就不需要清了
+            workbook = ExcelReader.headMap.get(key);
+            sheet = workbook.getSheetAt(0);
+        } else {
+            // 生成xlsx的Excel
+            workbook = new SXSSFWorkbook();
 
-        // 如需生成xls的Excel，请使用下面的工作簿对象，注意后续输出时文件后缀名也需更改为xls
-        //Workbook workbook = new HSSFWorkbook();
+            // 如需生成xls的Excel，请使用下面的工作簿对象，注意后续输出时文件后缀名也需更改为xls
+            //Workbook workbook = new HSSFWorkbook();
 
-        // 生成Sheet表，写入第一行的列头
-        Sheet sheet = buildDataSheet(workbook);
+            // 生成Sheet表，写入第一行的列头
+            sheet = buildDataSheet(workbook);
+        }
+
         //构建每行的数据内容
-        int rowNum = CELL_HEADS.size() == 0 ? 0 : 1;
+
+        int rowNum = CELL_HEADS.size() == 0 ? ExcelReader.headType == 2 ? ExcelReader.headType : 0 : ExcelReader.heandRowNum;
 
         for (Iterator<List<String>> it = dataList.iterator(); it.hasNext(); ) {
             List<String> data = it.next();
@@ -94,6 +106,35 @@ public class ExcelWriter {
      * @return 已经写入列头的Sheet
      */
     private static Sheet buildDataSheet(Workbook workbook) {
+        Sheet sheet = workbook.createSheet();
+        if (CELL_HEADS.size() == 0) {
+            return sheet;
+        }
+        // 设置列头宽度
+        for (int i = 0; i < CELL_HEADS.size(); i++) {
+            sheet.setColumnWidth(i, 4000);
+        }
+        // 设置默认行高
+        sheet.setDefaultRowHeight((short) 400);
+        // 构建头单元格样式
+        CellStyle cellStyle = buildHeadCellStyle(sheet.getWorkbook());
+        // 写入第一行各列的数据
+        Row head = sheet.createRow(0);
+        for (int i = 0; i < CELL_HEADS.size(); i++) {
+            Cell cell = head.createCell(i);
+            cell.setCellValue(CELL_HEADS.get(i));
+            cell.setCellStyle(cellStyle);
+        }
+        return sheet;
+    }
+
+    /**
+     * 生成sheet表，并写入第一行数据（列头）
+     *
+     * @param workbook 工作簿对象
+     * @return 已经写入列头的Sheet
+     */
+    private static Sheet buildDataSheet(Workbook workbook, String key) {
         Sheet sheet = workbook.createSheet();
         if (CELL_HEADS.size() == 0) {
             return sheet;

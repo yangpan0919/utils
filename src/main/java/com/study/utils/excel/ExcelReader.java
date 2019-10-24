@@ -28,7 +28,12 @@ public class ExcelReader {
 
     private static final String XLS = "xls";
     private static final String XLSX = "xlsx";
-    private static final boolean needHead = true; //是否需要表头
+    public static final int headType = 2; //0-->把表头当做内容输出 ,1-->不需要表头 ，2-->表头做输出文件表头
+
+    public static final int heandRowNum = 2; //表头行数
+
+    public static final Map<String, Workbook> headMap = new HashMap<>(); //为了存储表头结构，用作导出
+
 
     /**
      * 根据文件后缀名类型获取对应的工作簿对象
@@ -101,7 +106,7 @@ public class ExcelReader {
      * @param fileName 要读取的Excel文件所在路径
      * @return 读取结果列表，读取失败时返回null
      */
-    public static List<List<String>> readExcelForStr(String fileName) {
+    public static List<List<String>> readExcelForStr(String fileName, String key) {
 
         Workbook workbook = null;
         FileInputStream inputStream = null;
@@ -121,7 +126,7 @@ public class ExcelReader {
             workbook = getWorkbook(inputStream, fileType);
 
             // 读取excel中的数据
-            List<List<String>> resultDataList = parseExcelForStr(workbook);
+            List<List<String>> resultDataList = parseExcelForStr(workbook, key);
 
             return resultDataList;
         } catch (Exception e) {
@@ -129,9 +134,6 @@ public class ExcelReader {
             return null;
         } finally {
             try {
-                if (null != workbook) {
-                    workbook.close();
-                }
                 if (null != inputStream) {
                     inputStream.close();
                 }
@@ -235,7 +237,7 @@ public class ExcelReader {
      * @param workbook Excel工作簿对象
      * @return 解析结果
      */
-    private static List<List<String>> parseExcelForStr(Workbook workbook) {
+    private static List<List<String>> parseExcelForStr(Workbook workbook, String key) {
         List<List<String>> resultDataList = new ArrayList<>();
         // 解析sheet
         for (int sheetNum = 0; sheetNum < workbook.getNumberOfSheets(); sheetNum++) {
@@ -250,16 +252,29 @@ public class ExcelReader {
             int firstRowNum = sheet.getFirstRowNum();
             Row firstRow = sheet.getRow(firstRowNum);
             if (null == firstRow) {
-                logger.warning("解析Excel失败，在第一行没有读取到任何数据！");
+                logger.warning("在第一行没有读取到任何数据！,空sheet页");
+                continue;
             }
 
             // 解析每一行的数据，构造数据对象
             int rowStart;
 
-            if (needHead) {
+            if (headType == 0) {
                 rowStart = firstRowNum;
-            } else {
-                rowStart = firstRowNum + 1;
+            } else if (headType == 1) {
+                rowStart = firstRowNum + heandRowNum;
+            } else if (headType == 2) {
+                if (headMap.get(key) == null) {
+                    headMap.put(key, workbook);
+                } else {
+                    try {
+                        workbook.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                rowStart = heandRowNum;
             }
 
             int rowEnd = sheet.getPhysicalNumberOfRows();
@@ -287,7 +302,7 @@ public class ExcelReader {
      * @param cell
      * @return
      */
-    private static String convertCellValueToString(Cell cell) {
+    public static String convertCellValueToString(Cell cell) {
         if (cell == null) {
             return null;
         }

@@ -26,7 +26,7 @@ public class MainTest {
         String excelFileName = "D:\\test.xls";
         // 读取Excel文件内容
         List<ExcelDataVO> readResult = ExcelReader.readExcel(excelFileName);
-        List<List<String>> readResultStr = ExcelReader.readExcelForStr(excelFileName);
+        List<List<String>> readResultStr = ExcelReader.readExcelForStr(excelFileName, null);
 
         // todo 进行业务操作
 
@@ -49,7 +49,7 @@ public class MainTest {
         // 写入数据到工作簿对象内
         Workbook workbook = ExcelWriter.exportData(dataVOList);
 
-        Workbook workbookStr = ExcelWriter.exportDataForStr(readResultStr);
+        Workbook workbookStr = ExcelWriter.exportDataForStr(readResultStr,null);
 
 
         // 以文件的形式输出工作簿对象
