@@ -11,10 +11,11 @@ public class Main {
 
     public static void main(String[] args) {
 
-        List<File> files = Util.allFile("D:\\development\\eap-maven\\src\\main\\java\\cn\\tzauto\\octopus", ".java");
+        List<File> files = Util.allFile("D:\\development\\code\\eap\\src\\main", ".java");
         for (File file : files) {
             Util.checkFile(file, "MybatisSqlSession.get", "sqlSession.close()");
         }
+        System.out.println(Util.result.size());
         for (String s : Util.result) {
             System.out.println(s);
         }

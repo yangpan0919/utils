@@ -87,7 +87,7 @@ public class Util {
                 list.add(tmpString);
             }
 
-            int closeCount = 0;
+            int closeCount = 0; //非同级句法块，sqlSession.close()之后需要，return；
 
             boolean flag = false;
             boolean test = false;
@@ -114,8 +114,11 @@ public class Util {
                     }
                     continue;
                 }
+                if (file.getName().equals("EquipModel.java") && i == 519) {
+                    System.out.println("");
+                }
 
-                if (file.getName().equals("TowaHost.java") && i == 821) {
+                if (file.getName().equals("EquipModel.java") && i == 779) {
                     System.out.println("");
                 }
 
@@ -161,7 +164,9 @@ public class Util {
                             test = true;
                         }
                         if (closeCount == 1) {
+                            //子集里面try  finally 中的sqlSession也会被提醒
                             addData(file.getName(), count);
+                            closeCount = 0;
                             flag = false;
                             test = false;
                             startCount = 0;
@@ -214,10 +219,10 @@ public class Util {
                         } else if (s.contains("finally")) {
                             isFinally = true;
                         }
-                    }else if(isFinally && test && startCount == endCount + 2){
-                        if(s.contains("if ("+name+" != null) {")){
+                    } else if (isFinally && test && startCount == endCount + 2) {
+                        if (s.contains("if (" + name + " != null) {")) {
                             nullCheck = true;
-                        }else if(nullCheck){
+                        } else if (nullCheck) {
                             if (s.contains(targetStr)) {
                                 flag = false;
                                 test = false;
@@ -235,7 +240,7 @@ public class Util {
 
                     if (endCount > startCount) {
                         addData(file.getName(), count);
-
+                        closeCount = 0;
                         flag = false;
                         test = false;
                         startCount = 0;
