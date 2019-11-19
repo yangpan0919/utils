@@ -57,7 +57,7 @@ public class ErrorUtil {
             boolean temp = false;
             while ((tmpString = br.readLine()) != null) {
                 if (tmpString.trim().startsWith("+")) {
-                    list.set(list.size() - 1, list.get(list.size() - 1)+" " + tmpString.trim());
+                    list.set(list.size() - 1, list.get(list.size() - 1) + " " + tmpString.trim());
                     continue;
                 }
                 list.add(tmpString);
@@ -115,8 +115,8 @@ public class ErrorUtil {
 
                     loggerName = loggerName.substring(loggerName.lastIndexOf(" ")).trim();
                 }
-//
-                if (s.contains("{") && !s.contains("=") && s.indexOf("(") > 0 && (s.contains("public") || s.contains("private") || s.contains("void"))) {
+//前面四四个空格表示需要的方法必须是成员方法; 内部类中的方法未涉及
+                if (s.contains("{") && Util.spaceCount(s) == 4 && !s.contains("=") && s.indexOf("(") > 0 && (s.contains("public") || s.contains("private") || s.contains("void"))) {
 
                     methodName = s.substring(0, s.indexOf("(")).trim();
 
@@ -124,6 +124,9 @@ public class ErrorUtil {
                     isCatch = false;
                     spaceNum = -1;
                     needChange = 0;
+                } else if (Util.spaceCount(s) == 4 && s.contains("   class ")) {  //内部类，类名
+                    methodName = s.substring(s.indexOf("   class ") + 9).trim();
+                    methodName = methodName.substring(0, methodName.indexOf(" "));
                 }
 
                 if (s.contains("} catch (")) {
