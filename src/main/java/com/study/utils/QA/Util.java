@@ -6,12 +6,6 @@ import java.util.List;
 
 public class Util {
 
-    public static void main(String[] args) {
-        String name = "lj.xls";
-        if (name.endsWith("")) {
-            System.out.println("+++++");
-        }
-    }
 
     /**
      * 获取文件夹,里面的的所有以shffix 结尾的文件,加入list中
@@ -106,6 +100,9 @@ public class Util {
                     continue;
                 } else if (s.trim().startsWith("/*")) {
                     temp = true;
+                    if (s.trim().endsWith("*/")) {
+                        temp = false;
+                    }
                     continue;
                 }
                 if (temp) {
@@ -359,6 +356,75 @@ public class Util {
             }
         }
         result.add(s1 + "所在行数为：" + count);
+    }
+
+
+    /**
+     * 返回字符串的前置空格数
+     *
+     * @param str
+     * @return
+     */
+    public static int spaceCount(String str) {
+
+        return spaceCount(str, 0, str.length());
+    }
+
+    private static int spaceCount(String str, int i, int max) {
+        if (i == max) {
+            return i;
+        }
+
+        if (" ".equals(str.substring(i, i + 1))) {
+            return spaceCount(str, i + 1, max);
+        }
+
+        return i;
+    }
+
+    /**
+     * 在字符窗前面添加空格
+     *
+     * @param str
+     * @param num
+     * @return
+     */
+    public static String addPreSpace(String str, int num) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < num; i++) {
+            sb.append(" ");
+        }
+        sb.append(str);
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        String name = "logger.error(\"获取设备信息失败,检查通讯状况\");";
+        System.out.println(noConstantStr(name, "\""));
+    }
+
+    /**
+     * 去除两个符号的中间部分
+     *
+     * @param str
+     * @param temp
+     * @return
+     */
+    public static String noConstantStr(String str, String temp) {
+        String[] arr = str.split("");
+        boolean flag = true;
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < arr.length; i++) {
+            String s = arr[i];
+            if (s.equals(temp)) {
+                flag = !flag;
+                continue;
+            }
+            if (flag) {
+                sb.append(s);
+            }
+        }
+        return sb.toString();
     }
 
 
