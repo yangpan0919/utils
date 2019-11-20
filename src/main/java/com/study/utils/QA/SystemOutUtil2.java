@@ -41,6 +41,37 @@ public class SystemOutUtil2 {
                 if (tmpString.contains("System.out.print")) {
                     count++;
                 }
+                list.add(tmpString);
+            }
+            int spaceNum = -1;
+            boolean isCatch = false;
+            for (int i = 0; i < list.size(); i++) {
+                String s = list.get(i);
+                if (s.contains(" catch ")) {
+                    if (isCatch) {
+                        if (Util.spaceCount(s) == spaceNum) {
+                            isCatch = false;
+                            spaceNum = -1;
+                        }
+                    }
+                    isCatch = true;
+                    spaceNum = Util.spaceCount(s);
+                    continue;
+
+                }
+                if (isCatch) {
+                    if (Util.spaceCount(s) == spaceNum) {
+                        isCatch = false;
+                        spaceNum = -1;
+                    } else {
+                        if (s.contains(".info(") || s.contains(".debug(")) {
+                            System.out.println(file.getName() + "======" + (i + 1));
+
+                        }
+
+                    }
+                }
+
             }
 
         } catch (Exception e) {
