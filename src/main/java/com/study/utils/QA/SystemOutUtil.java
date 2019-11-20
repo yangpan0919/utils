@@ -6,6 +6,10 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 无用的System.out.在代码中的清除
+ * 实际代码中的System.out需要手动筛选清除
+ */
 public class SystemOutUtil {
     public static void main(String[] args) {
         List<File> files = Util.allFile("D:\\development\\eap-maven\\src\\main", ".java");

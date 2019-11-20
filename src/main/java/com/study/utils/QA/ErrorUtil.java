@@ -5,6 +5,9 @@ import org.apache.commons.io.FileUtils;
 import java.io.*;
 import java.util.*;
 
+/**
+ * error日志打印的是否合理
+ */
 public class ErrorUtil {
 
     public static int count = 0;

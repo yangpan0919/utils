@@ -5,6 +5,8 @@ import java.util.List;
 
 /**
  * 在项目代码全部格式化的情况下使用
+ * 改用数据库连接池
+ * sqlSession.close 关闭的情况是否合理
  */
 public class Main {
 
