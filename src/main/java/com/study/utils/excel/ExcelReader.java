@@ -382,7 +382,9 @@ public class ExcelReader {
                     logger.warning("第 " + row.getRowNum() + "行数据不合法，已忽略！");
                     continue;
                 }
-                resultDataList.add(resultData);
+                if (resultData.size() > 0) {  // 空行不需要
+                    resultDataList.add(resultData);
+                }
             }
         }
 
@@ -400,7 +402,7 @@ public class ExcelReader {
         if (cell == null) {
             return "";
         }
-        String returnValue = null;
+        String returnValue = "";
         switch (cell.getCellType()) {
             case NUMERIC:   //数字
                 Double doubleValue = cell.getNumericCellValue();
