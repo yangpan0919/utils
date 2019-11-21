@@ -143,6 +143,7 @@ public class ExcelReader {
             }
         }
     }
+
     /**
      * 读取Excel文件内容
      *
@@ -376,11 +377,7 @@ public class ExcelReader {
                     continue;
                 }
                 List<String> resultData = convertRowToDataForStr(row);
-                for (int i = 0; i < resultData.size(); i++) {
-                    if (resultData.get(i) == null) {
-                        resultData.set(i, "");
-                    }
-                }
+
                 if (null == resultData) {
                     logger.warning("第 " + row.getRowNum() + "行数据不合法，已忽略！");
                     continue;
@@ -401,7 +398,7 @@ public class ExcelReader {
      */
     public static String convertCellValueToString(Cell cell) {
         if (cell == null) {
-            return null;
+            return "";
         }
         String returnValue = null;
         switch (cell.getCellType()) {
@@ -420,13 +417,16 @@ public class ExcelReader {
                 returnValue = booleanValue.toString();
                 break;
             case BLANK:     // 空值
+                returnValue = "";
                 break;
             case FORMULA:   // 公式
                 returnValue = cell.getCellFormula();
                 break;
             case ERROR:     // 故障
+                System.out.println("故障");
                 break;
             default:
+                System.out.println("需要检查");
                 break;
         }
         return returnValue;
