@@ -8,7 +8,7 @@ import java.util.List;
  * 改用数据库连接池
  * sqlSession.close 关闭的情况是否合理
  */
-public class Main {
+public class SqlSessionMain {
 
 
     public static void main(String[] args) {

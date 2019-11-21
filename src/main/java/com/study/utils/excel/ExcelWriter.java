@@ -100,6 +100,42 @@ public class ExcelWriter {
     }
 
     /**
+     * 生成Excel并写入数据信息
+     *
+     * @param dataList 数据列表
+     * @return 写入数据后的工作簿对象
+     */
+    public static Workbook exportDataForStr(List<List<String>> dataList) {
+        Workbook workbook = null;
+        Sheet sheet = null;
+
+        // 生成xlsx的Excel
+        workbook = new SXSSFWorkbook();
+
+        // 如需生成xls的Excel，请使用下面的工作簿对象，注意后续输出时文件后缀名也需更改为xls
+        //Workbook workbook = new HSSFWorkbook();
+
+        // 生成Sheet表，写入第一行的列头
+        sheet = buildDataSheet(workbook);
+
+
+        //构建每行的数据内容
+
+        int rowNum = 0;
+
+        for (Iterator<List<String>> it = dataList.iterator(); it.hasNext(); ) {
+            List<String> data = it.next();
+            if (data == null) {
+                continue;
+            }
+            //输出行数据
+            Row row = sheet.createRow(rowNum++);
+            convertDataToRowForStr(data, row);
+        }
+        return workbook;
+    }
+
+    /**
      * 生成sheet表，并写入第一行数据（列头）
      *
      * @param workbook 工作簿对象

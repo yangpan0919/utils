@@ -143,6 +143,49 @@ public class ExcelReader {
             }
         }
     }
+    /**
+     * 读取Excel文件内容
+     *
+     * @param fileName 要读取的Excel文件所在路径
+     * @return 读取结果列表，读取失败时返回null
+     */
+    public static List<List<String>> readExcelForStr(String fileName) {
+
+        Workbook workbook = null;
+        FileInputStream inputStream = null;
+
+        try {
+            // 获取Excel后缀名
+            String fileType = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length());
+            // 获取Excel文件
+            File excelFile = new File(fileName);
+            if (!excelFile.exists()) {
+                logger.warning("指定的Excel文件不存在！");
+                return null;
+            }
+
+            // 获取Excel工作簿
+            inputStream = new FileInputStream(excelFile);
+            workbook = getWorkbook(inputStream, fileType);
+
+            // 读取excel中的数据
+            List<List<String>> resultDataList = parseExcelForStr(workbook);
+
+            return resultDataList;
+        } catch (Exception e) {
+            logger.warning("解析Excel失败，文件名：" + fileName + " 错误信息：" + e.getMessage());
+            return null;
+        } finally {
+            try {
+                if (null != inputStream) {
+                    inputStream.close();
+                }
+            } catch (Exception e) {
+                logger.warning("关闭数据流出错！错误信息：" + e.getMessage());
+                return null;
+            }
+        }
+    }
 
     /**
      * 读取Excel文件内容
@@ -295,6 +338,60 @@ public class ExcelReader {
 
         return resultDataList;
     }
+
+    /**
+     * 解析Excel数据
+     *
+     * @param workbook Excel工作簿对象
+     * @return 解析结果
+     */
+    private static List<List<String>> parseExcelForStr(Workbook workbook) {
+        List<List<String>> resultDataList = new ArrayList<>();
+        // 解析sheet
+        for (int sheetNum = 0; sheetNum < workbook.getNumberOfSheets(); sheetNum++) {
+            Sheet sheet = workbook.getSheetAt(sheetNum);
+
+            // 校验sheet是否合法
+            if (sheet == null) {
+                continue;
+            }
+
+            // 获取第一行数据
+            int firstRowNum = sheet.getFirstRowNum();
+            Row firstRow = sheet.getRow(firstRowNum);
+            if (null == firstRow) {
+                logger.warning("在第一行没有读取到任何数据！,空sheet页");
+                continue;
+            }
+
+            // 解析每一行的数据，构造数据对象
+
+            int rowStart = firstRowNum;
+
+            int rowEnd = sheet.getPhysicalNumberOfRows();
+            for (int rowNum = rowStart; rowNum < rowEnd; rowNum++) {
+                Row row = sheet.getRow(rowNum);
+
+                if (null == row) {
+                    continue;
+                }
+                List<String> resultData = convertRowToDataForStr(row);
+                for (int i = 0; i < resultData.size(); i++) {
+                    if (resultData.get(i) == null) {
+                        resultData.set(i, "");
+                    }
+                }
+                if (null == resultData) {
+                    logger.warning("第 " + row.getRowNum() + "行数据不合法，已忽略！");
+                    continue;
+                }
+                resultDataList.add(resultData);
+            }
+        }
+
+        return resultDataList;
+    }
+
 
     /**
      * 将单元格内容转换为字符串
