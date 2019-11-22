@@ -65,8 +65,11 @@ public class zhu2 {
                 handleCountyDir(file1, key);
             }
         } else if (file.isFile()) {
-            List<List<String>> readResultStr = ExcelReader.readExcelForStr(file.getAbsolutePath());
-            map.get(key).addAll(handlerResultList(readResultStr, file.getAbsolutePath()));
+            if (file.getName().endsWith(".xls") || file.getName().endsWith(".xlsx")) {
+                List<List<String>> readResultStr = ExcelReader.readExcelForStr(file.getAbsolutePath());
+
+                map.get(key).addAll(handlerResultList(readResultStr, file.getAbsolutePath()));
+            }
         }
 
 
@@ -89,60 +92,99 @@ public class zhu2 {
 
     private static List<String> handlerResultList(List<List<String>> readResultStr, String path) {
         List<String> result = new ArrayList<>();
-        boolean isFirst = true; //是否取第一列
-        int count = 0;
-        if (readResultStr.size() > 10) {
-            for (int i = 4; i < 8; i++) {
-                List<String> list = readResultStr.get(i);
-                if (list.get(0).trim().equals("")) {
-                    count++;
-                }
-            }
-        } else if (readResultStr.size() > 4) {
-            for (int i = readResultStr.size() - 5; i < readResultStr.size() - 1; i++) {
-                List<String> list = readResultStr.get(i);
-                if (list.get(0).trim().equals("")) {
-                    count++;
-                }
-            }
-        } else if (readResultStr.size() > 2) {
-
-            List<String> list = readResultStr.get(1);
-            if (list.get(0).trim().equals("")) {
-                count = 2;
-            }
-            list = readResultStr.get(2);
-            if (list.get(0).trim().equals("")) {
-                count++;
-            }
-
-
-        } else {
-            System.out.println(path + "处的文件内容数据量太少了");
+        if (readResultStr.size() == 0) {
             return result;
         }
-        if (count >= 3) {
-            isFirst = false;
+        boolean isFirst = true; //是否取第一列
+        int count = -1;
+        List<String> list1 = readResultStr.get(0);
+        for (int i = 0; i < list1.size(); i++) {
+            if (list1.get(i).trim().equalsIgnoreCase("text")) {
+                count = i;
+                break;
+            }
         }
+        if (count == -1) {
+            System.out.println(path + "：处的文件中没有text 的表头");
+            return result;
+        }
+
+
+//        if (readResultStr.size() > 10) {
+//            for (int i = 4; i < 8; i++) {
+//                List<String> list = readResultStr.get(i);
+//                if (list.get(0).trim().equals("")) {
+//                    count++;
+//                }
+//            }
+//        } else if (readResultStr.size() > 4) {
+//            for (int i = readResultStr.size() - 5; i < readResultStr.size() - 1; i++) {
+//                List<String> list = readResultStr.get(i);
+//                if (list.get(0).trim().equals("")) {
+//                    count++;
+//                }
+//            }
+//        } else if (readResultStr.size() > 2) {
+//
+//            List<String> list = readResultStr.get(1);
+//            if (list.get(0).trim().equals("")) {
+//                count = 2;
+//            }
+//            list = readResultStr.get(2);
+//            if (list.get(0).trim().equals("")) {
+//                count++;
+//            }
+//
+//
+//        } else {
+//            System.out.println(path + "处的文件内容数据量太少了");
+//            return result;
+//        }
+//        if (count >= 3) {
+//            isFirst = false;
+//        }
 
         for (int i = 0; i < readResultStr.size(); i++) {
             List<String> list = readResultStr.get(i);
-            if (isFirst) {
-                String s = list.get(0).trim();
-                if (headList.contains(s)) {
-                    continue;
-                }
-                result.add(s);
-            } else {
-                if (list.size() < 2) {
-                    System.out.println(path + "处的文件有问题，请看看内容仔细核对！！！");
-                }
-                String s = list.get(1).trim();
-                if (headList.contains(s)) {
-                    continue;
-                }
-                result.add(list.get(1));
+
+            if (list == null || list.size() == 0) {
+                continue;
             }
+            if (count >= list.size()) {
+                continue;
+            }
+
+            String s1 = list.get(count);
+            s1 = s1 == null ? "" : s1.trim();
+            if (headList.contains(s1)) {
+                continue;
+            }
+            result.add(s1);
+
+
+//            for (int i1 = 0; i1 < list.size(); i1++) {
+//                String s = list.get(i1);
+//                if (s == null) {
+//                    list.set(i1, "");
+//                }
+//            }
+//
+//            if (isFirst) {
+//                String s = list.get(0).trim();
+//                if (headList.contains(s)) {
+//                    continue;
+//                }
+//                result.add(s);
+//            } else {
+//                if (list.size() < 2) {
+//                    System.out.println(path + "处的文件有问题，请看看内容仔细核对！！！");
+//                }
+//                String s = list.get(1).trim();
+//                if (headList.contains(s)) {
+//                    continue;
+//                }
+//                result.add(list.get(1));
+//            }
         }
         return result;
 
