@@ -37,6 +37,7 @@ public class SystemOutUtil2 {
             String tmpString = "";
             List<String> list = new ArrayList<>();
             boolean flag = false;
+            int tempCount = 0;
             while ((tmpString = br.readLine()) != null) {
                 if (tmpString.contains("System.out.print")) {
                     count++;
@@ -69,9 +70,21 @@ public class SystemOutUtil2 {
 
                         }
 
-                    }
-                }
+                        if (s.contains(".error(")) {
+                            if(file.getName().equals("ISecsConnection.java")){
+                                System.out.println("");
+                            }
+                            tempCount++;
+                            if (tempCount > 1) {
+                                System.out.println(file.getName() + "---------------------" + (i + 1));
+                            }
+                        }
 
+                    }
+
+                } else {
+                    tempCount = 0;
+                }
             }
 
         } catch (Exception e) {
