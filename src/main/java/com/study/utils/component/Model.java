@@ -19,24 +19,64 @@ public class Model {
 //        System.out.println(model.getaBoolean());
 //        System.out.println(model.getTemp());
 //        System.out.println(model.isFlag());
-//        CountDownLatch countDownLatch = new CountDownLatch(2);
-//        new Thread(() -> {
-//            countDownLatch.countDown();
-//            model.test1(1);
-//        }).start();
-//        new Thread(() -> {
-//            countDownLatch.countDown();
-//            model.test1(2);
-//        }).start();
-//        Thread.sleep(1000L);
+        CountDownLatch countDownLatch = new CountDownLatch(2);
+        new Thread(() -> {
+            countDownLatch.countDown();
+            model.test1();
+        }).start();
+        new Thread(() -> {
+            countDownLatch.countDown();
+            model.test2();
+        }).start();
+        Thread.sleep(5000L);
 
         System.out.println(model.getaBoolean());
-        System.out.println(model.getTemp());
+//        System.out.println(model.get());
         System.out.println(model.isFlag());
         model.test();
     }
 
-    List<LockObject> temp = new ArrayList<>();
+    private void test2() {
+        int finalI = 2;
+        LockObject lockObject = new LockObject(finalI);
+        if (getPassport(lockObject)) {
+            System.out.println(System.currentTimeMillis() + "执行的ID为:" + finalI);
+            try {
+                Thread.sleep(2L);
+                if (finalI == 4) {
+                    return;
+//                            Thread.sleep(3000L);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            returnPassport();
+        } else {
+            System.out.println("获取失败的ID为:" + finalI);
+        }
+    }
+
+    private void test1() {
+        int finalI = 1;
+        LockObject lockObject = new LockObject(finalI);
+        if (getPassport(lockObject)) {
+            System.out.println(System.currentTimeMillis() + "执行的ID为:" + finalI);
+            try {
+                Thread.sleep(2L);
+                if (finalI == 4) {
+                    return;
+//                            Thread.sleep(3000L);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            returnPassport();
+        } else {
+            System.out.println("获取失败的ID为:" + finalI);
+        }
+    }
+
+    List<LockObject> list = new ArrayList<>();
 
     AtomicBoolean aBoolean = new AtomicBoolean(false);
 
@@ -44,9 +84,6 @@ public class Model {
 
     volatile boolean flag = true;
 
-    public List<LockObject> getTemp() {
-        return temp;
-    }
 
     public AtomicBoolean getaBoolean() {
         return aBoolean;
@@ -149,9 +186,9 @@ public class Model {
         flag = false;
         //从集合中获取，下一个对象
         if (aBoolean.compareAndSet(true, false)) {
-            temp.get(0).getCountDownLatch().countDown();
-            temp.remove(0);
-            if (temp.size() == 0) {
+            list.get(0).getCountDownLatch().countDown();
+            list.remove(0);
+            if (list.size() == 0) {
                 flag = true;
             }
         } else {
@@ -161,7 +198,7 @@ public class Model {
 
     private synchronized void returnPassport() {
         if (aBoolean.get()) {
-            if (temp.size() > 0) {
+            if (list.size() > 0) {
                 listHandler();
             } else {//集合里面没有元素
                 if (!aBoolean.compareAndSet(true, false)) {
@@ -188,6 +225,11 @@ public class Model {
 
     private boolean getPassport2(LockObject level) {
         try {
+            //处理并发，1执行了释放完时，2刚好入队了
+            if (flag && aBoolean.compareAndSet(false, true)) {
+                preTime = System.currentTimeMillis();
+                return true;
+            }
             boolean await = level.getCountDownLatch().await(3, TimeUnit.SECONDS);
             if (await && aBoolean.compareAndSet(false, true)) {
                 preTime = System.currentTimeMillis();
@@ -212,18 +254,18 @@ public class Model {
      */
     private synchronized boolean remove(LockObject level) {
         long now = System.currentTimeMillis();
-        if (now - preTime > 10000L) { //大于三十秒，还没有释放锁，有可能锁没有被释放,强制直接直接执行
+        if (now - preTime > 30000L) { //大于三十秒，还没有释放锁，有可能锁没有被释放,强制直接直接执行
             returnPassport();
             return true;
         }
         System.out.println("超时，还是没有获取到锁");
-        temp.remove(level);
+        list.remove(level);
         return false;
     }
 
     private synchronized void addSort(LockObject level) {
-        temp.add(level);
-        Collections.sort(temp);
+        list.add(level);
+        Collections.sort(list);
 
     }
 }
