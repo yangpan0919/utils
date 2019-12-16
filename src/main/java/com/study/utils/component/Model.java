@@ -13,10 +13,23 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class Model {
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         Model model = new Model();
-        model.test();
-        model.test1();
+//        model.test();
+//        System.out.println(model.getaBoolean());
+//        System.out.println(model.getTemp());
+//        System.out.println(model.isFlag());
+//        CountDownLatch countDownLatch = new CountDownLatch(2);
+//        new Thread(() -> {
+//            countDownLatch.countDown();
+//            model.test1(1);
+//        }).start();
+//        new Thread(() -> {
+//            countDownLatch.countDown();
+//            model.test1(2);
+//        }).start();
+//        Thread.sleep(1000L);
+
         System.out.println(model.getaBoolean());
         System.out.println(model.getTemp());
         System.out.println(model.isFlag());
@@ -43,26 +56,26 @@ public class Model {
         return flag;
     }
 
-    public void test1() {
-        if (getPassport(new LockObject(-1))) {
-            System.out.println(System.currentTimeMillis() + "执行的ID为:" + -1);
-            try {
-                Thread.sleep(2L);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            returnPassport();
-        } else {
-            System.out.println("获取失败的ID为:" + -1);
-        }
-    }
+//    public void test1(int i) {
+//        if (getPassport(new LockObject(i))) {
+//            System.out.println(System.currentTimeMillis() + "执行的ID为:" + i);
+//            try {
+//                Thread.sleep(2L);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//            returnPassport(i);
+//        } else {
+//            System.out.println("获取失败的ID为:" + i);
+//        }
+//    }
 
     public void test() {
 
         int count = 100;
         CountDownLatch countDownLatch = new CountDownLatch(count);
 
-        for (int i = 0; i < count; i++) {
+        for (int i = 3; i < count; i++) {
 
             int finalI = i;
             new Thread(() -> {
@@ -98,19 +111,59 @@ public class Model {
 
 
     }
+//
+//    private synchronized void returnPassport(int i) {
+//        if (aBoolean.get()) {
+//            System.out.println("111" + i);
+//            if (temp.size() > 0) {
+//                System.out.println("1");
+//                flag = false;
+//                System.out.println(temp);
+//                //从集合中获取，下一个对象
+//                if (aBoolean.compareAndSet(true, false)) {
+//                    System.out.println("3");
+//                    temp.get(0).getCountDownLatch().countDown();
+//                    temp.remove(0);
+//                    if (temp.size() == 0) {
+//                        System.out.println("4");
+//                        flag = true;
+//                    }
+//                } else {
+//                    System.out.println("锁异常");
+//                }
+//            } else {//集合里面没有元素
+//                System.out.println("2");
+//                if (!aBoolean.compareAndSet(true, false)) {
+//                    System.out.println("锁异常111");
+//                }
+//            }
+//        } else {
+//            System.out.println("错误111");
+//        }
+//    }
+
+    /**
+     * 返回资源后，先处理list中优先级大的对象
+     */
+    private void listHandler() {
+        flag = false;
+        //从集合中获取，下一个对象
+        if (aBoolean.compareAndSet(true, false)) {
+            temp.get(0).getCountDownLatch().countDown();
+            temp.remove(0);
+            if (temp.size() == 0) {
+                flag = true;
+            }
+        } else {
+            System.out.println("锁异常");
+        }
+    }
 
     private synchronized void returnPassport() {
         if (aBoolean.get()) {
             if (temp.size() > 0) {
-                flag = false;
-                //从集合中获取，下一个对象
-                if (aBoolean.compareAndSet(true, false)) {
-                    temp.get(0).getCountDownLatch().countDown();
-                    temp.remove(0);
-                } else {
-                    System.out.println("锁异常");
-                }
-            } else {
+                listHandler();
+            } else {//集合里面没有元素
                 if (!aBoolean.compareAndSet(true, false)) {
                     System.out.println("锁异常111");
                 }
@@ -135,15 +188,13 @@ public class Model {
 
     private boolean getPassport2(LockObject level) {
         try {
-
             boolean await = level.getCountDownLatch().await(3, TimeUnit.SECONDS);
             if (await && aBoolean.compareAndSet(false, true)) {
                 preTime = System.currentTimeMillis();
                 flag = true;
                 return true;
             } else {
-                remove(level);
-                System.out.println("还是没有获取到锁");
+                return remove(level);
             }
         } catch (InterruptedException e) {
             //超时，或线程中断
@@ -159,13 +210,15 @@ public class Model {
      *
      * @param level
      */
-    private synchronized void remove(LockObject level) {
-        temp.remove(level);
+    private synchronized boolean remove(LockObject level) {
         long now = System.currentTimeMillis();
-        if (now - preTime > 10000L) { //大于十秒，还没有释放锁，有可能锁没有被释放
+        if (now - preTime > 10000L) { //大于三十秒，还没有释放锁，有可能锁没有被释放,强制直接直接执行
             returnPassport();
+            return true;
         }
-
+        System.out.println("超时，还是没有获取到锁");
+        temp.remove(level);
+        return false;
     }
 
     private synchronized void addSort(LockObject level) {
