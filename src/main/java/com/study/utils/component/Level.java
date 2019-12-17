@@ -1,12 +1,9 @@
 package com.study.utils.component;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class LockObject implements Comparable<LockObject> {
+public class Level implements Comparable<Level> {
 
     private int level;
 
@@ -16,7 +13,7 @@ public class LockObject implements Comparable<LockObject> {
         return countDownLatch;
     }
 
-    public LockObject(int level) {
+    public Level(int level) {
         this.level = level;
     }
 
@@ -26,7 +23,7 @@ public class LockObject implements Comparable<LockObject> {
 
 
     @Override
-    public int compareTo(LockObject temp) {
+    public int compareTo(Level temp) {
         return temp.getLevel() - this.getLevel();
     }
 
@@ -38,8 +35,8 @@ public class LockObject implements Comparable<LockObject> {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        LockObject lockObject = new LockObject(1);
-        boolean await = lockObject.getCountDownLatch().await(3, TimeUnit.SECONDS);
+        Level level = new Level(1);
+        boolean await = level.getCountDownLatch().await(3, TimeUnit.SECONDS);
         System.out.println(await);
 
     }
