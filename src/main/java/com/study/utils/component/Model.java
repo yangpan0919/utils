@@ -57,25 +57,19 @@ public class Model {
     }
 
     private void test1() {
-        int finalI = 1;
-        Level level = new Level(finalI);
-        if (getPassport(level)) {
-
+        if (getPassport(new Level(1))) {
             try {
-                System.out.println(System.currentTimeMillis() + "执行的ID为:" + finalI);
-                Thread.sleep(2L);
-                if (finalI == 4) {
-                    return;
-//                            Thread.sleep(3000L);
-                }
+                System.out.println(System.currentTimeMillis() + "执行的ID为:" + 1);
+                Thread.sleep(12L);
+//                           Thread.sleep(3000L);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } finally {
-
+                releasePassport();
             }
-            releasePassport();
+
         } else {
-            System.out.println("获取失败的ID为:" + finalI);
+            System.out.println("获取失败的ID为:" + 1);
         }
     }
 
@@ -198,6 +192,7 @@ public class Model {
             System.out.println("锁异常");
         }
     }
+
     /**
      * 释放资源
      */
@@ -272,6 +267,7 @@ public class Model {
         list.remove(level);
         return false;
     }
+
     /**
      * 将等待对象，加入集合中，并排序,将优先级大的排在前面
      *

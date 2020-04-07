@@ -10,7 +10,7 @@ public class S9F9Parse {
 
     public static void main(String[] args) throws Exception {
 
-        File file = new File("E:\\application\\WeChat\\WeChat Files\\WeChat Files\\yangpan0919\\FileStorage\\File\\2019-12\\D3500-5001host.log.4");
+        File file = new File("E:\\application\\WeChat\\WeChat Files\\WeChat Files\\yangpan0919\\FileStorage\\File\\2019-12\\A1500-0001host.log");
 
         FileInputStream fileInputStream = FileUtils.openInputStream(file);
         BufferedReader br = null;
