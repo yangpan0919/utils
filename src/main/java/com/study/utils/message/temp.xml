@@ -1,0 +1,45 @@
+<MapData xmlns="urn:semi-org:xsd.E142-1.V1005.SubstrateMap">
+    <SubstrateMaps>
+        <SubstrateMap SubstrateType="Strip" SubstrateId="NM9BL24210011-11-05" LayoutSpecifier="1" Orientation="0"
+                      OriginLocation="UpperRight" SubstrateSide="TopSide" AxisDirection="DownLeft">
+            <Overlay MapName="BinCodeMap" MapVersion="2">
+                <BinCodeMap BinType="HexaDecimal" NullBin="FF">
+                    <BinCode><![CDATA[01010101018101010101]]></BinCode>
+                    <BinCode><![CDATA[01018101810101010101]]></BinCode>
+                    <BinCode><![CDATA[01010101010101010101]]></BinCode>
+                </BinCodeMap>
+            </Overlay>
+            <Overlay MapName="WaferToStrip">
+                <TransferMap FromSubstrateId="T4SC25.0013.TEST" FromSubstrateType="Wafer">
+                    <T FX="2" FY="19" TX="0" TY="0"/>
+                    <T FX="3" FY="19" TX="0" TY="1"/>
+                    <T FX="4" FY="19" TX="0" TY="2"/>
+                    <T FX="5" FY="19" TX="1" TY="0"/>
+                    <T FX="6" FY="19" TX="1" TY="1"/>
+                    <T FX="7" FY="19" TX="1" TY="2"/>
+                    <T FX="8" FY="19" TX="2" TY="0"/>
+                    <T FX="9" FY="19" TX="2" TY="1"/>
+                    <T FX="10" FY="19" TX="2" TY="2"/>
+                    <T FX="11" FY="19" TX="3" TY="0"/>
+                    <T FX="12" FY="19" TX="3" TY="1"/>
+                    <T FX="13" FY="19" TX="3" TY="2"/>
+                    <T FX="14" FY="19" TX="4" TY="1"/>
+                    <T FX="15" FY="19" TX="4" TY="2"/>
+                    <T FX="16" FY="19" TX="5" TY="0"/>
+                    <T FX="17" FY="19" TX="5" TY="2"/>
+                    <T FX="18" FY="19" TX="6" TY="0"/>
+                    <T FX="19" FY="19" TX="6" TY="1"/>
+                    <T FX="21" FY="19" TX="6" TY="2"/>
+                    <T FX="22" FY="19" TX="7" TY="0"/>
+                    <T FX="23" FY="19" TX="7" TY="2"/>
+                    <T FX="24" FY="19" TX="8" TY="0"/>
+                    <T FX="25" FY="19" TX="8" TY="1"/>
+                    <T FX="27" FY="19" TX="8" TY="2"/>
+                    <T FX="28" FY="19" TX="9" TY="0"/>
+                    <T FX="29" FY="19" TX="9" TY="1"/>
+                    <T FX="30" FY="19" TX="9" TY="2"/>
+                </TransferMap>
+            </Overlay>
+        </SubstrateMap>
+    </SubstrateMaps>
+</MapData>
