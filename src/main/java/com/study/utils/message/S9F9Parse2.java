@@ -8,11 +8,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * 检查有问题的s9f9,及行数
+ */
 public class S9F9Parse2 {
 
     public static void main(String[] args) throws Exception {
 
-        File file = new File("E:\\application\\WeChat\\WeChat Files\\WeChat Files\\yangpan0919\\FileStorage\\File\\2020-04\\D1500-0033host.txt");
+        File file = new File("E:\\application\\WeChat\\WeChat Files\\WeChat Files\\yangpan0919\\FileStorage\\File\\2020-04\\D1500-0032host.log.6");
 
         FileInputStream fileInputStream = FileUtils.openInputStream(file);
         BufferedReader br = null;
@@ -128,12 +131,13 @@ public class S9F9Parse2 {
         AtomicBoolean temp = new AtomicBoolean(true);
         inMap.forEach((x, y) -> {
             if (outMap.get(x) == null) {
-                System.out.println(y);
+                //y 为异常消息内容
+                System.out.println(y + "  s9f9in所在行数为：" + (line + 2));
                 temp.set(false);
             }
         });
         if (temp.get()) {
-            System.out.println("无头s9f9in...坐标：" + line + 2);
+            System.out.println("无头s9f9in...坐标：" + (line + 2));
         }
 
     }
