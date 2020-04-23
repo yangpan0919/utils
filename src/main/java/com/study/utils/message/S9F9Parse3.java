@@ -16,7 +16,7 @@ public class S9F9Parse3 {
     public static void main(String[] args) throws Exception {
 
         String path = "E:\\application\\WeChat\\WeChat Files\\WeChat Files\\yangpan0919\\FileStorage\\File\\2020-04\\";
-        String name = "D3500-6019host.log";
+        String name = "D1600-0083host.log.2";
         File file = new File(path + name);
 
 
@@ -35,13 +35,13 @@ public class S9F9Parse3 {
         while ((tmpString = br.readLine()) != null) {
             list.add(tmpString);
         }
-        TreeMap<Integer, String> inMap = new TreeMap<>();
-        TreeMap<Integer, LocalDateTime> inTimeMap = new TreeMap<>();
-        TreeMap<Integer, Integer> inLineMap = new TreeMap<>();
+        TreeMap<Long, String> inMap = new TreeMap<>();
+        TreeMap<Long, LocalDateTime> inTimeMap = new TreeMap<>();
+        TreeMap<Long, Integer> inLineMap = new TreeMap<>();
 
-        TreeMap<Integer, String> outMap = new TreeMap<>();
-        TreeMap<Integer, LocalDateTime> outTimeMap = new TreeMap<>();
-        TreeMap<Integer, Integer> outLineMap = new TreeMap<>();
+        TreeMap<Long, String> outMap = new TreeMap<>();
+        TreeMap<Long, LocalDateTime> outTimeMap = new TreeMap<>();
+        TreeMap<Long, Integer> outLineMap = new TreeMap<>();
 
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         DateTimeFormatter out = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -54,12 +54,12 @@ public class S9F9Parse3 {
                 String s = list.get(i - 1);
                 int index = s.indexOf("transactionId = ");
                 String substring1 = s.substring(index + 16);
-                index = Integer.parseInt(substring1.substring(0, substring1.indexOf(" ")));
-                inMap.put(index, s1);
-                inLineMap.put(index, i + 1);
+                long indexLong = Long.parseLong(substring1.substring(0, substring1.indexOf(" ")));
+                inMap.put(indexLong, s1);
+                inLineMap.put(indexLong, i + 1);
                 String substring = s.substring(s.indexOf("[") + 1, s.indexOf("]"));
                 LocalDateTime inTime = LocalDateTime.parse(substring, dateTimeFormatter);
-                inTimeMap.put(index, inTime);
+                inTimeMap.put(indexLong, inTime);
 
 
             } else if ("S9F9 input".equals(s1)) {
@@ -67,55 +67,55 @@ public class S9F9Parse3 {
                 String s = list.get(i - 1);
                 int index = s.indexOf("transactionId = ");
                 String substring1 = s.substring(index + 16);
-                index = Integer.parseInt(substring1.substring(0, substring1.indexOf(" ")));
+                long indexLong = Long.parseLong(substring1.substring(0, substring1.indexOf(" ")));
 
-                inMap.put(index, "S9F9");
-                outMap.put(index, "S9F9");
-                inLineMap.put(index, i + 1);
-                outLineMap.put(index, i + 1);
+                inMap.put(indexLong, "S9F9");
+                outMap.put(indexLong, "S9F9");
+                inLineMap.put(indexLong, i + 1);
+                outLineMap.put(indexLong, i + 1);
 
                 String substring = s.substring(s.indexOf("[") + 1, s.indexOf("]"));
                 LocalDateTime inTime = LocalDateTime.parse(substring, dateTimeFormatter);
-                inTimeMap.put(index, inTime);
-                outTimeMap.put(index, inTime);
+                inTimeMap.put(indexLong, inTime);
+                outTimeMap.put(indexLong, inTime);
 
             } else if (s1.startsWith("receive linktest.req")) {
 
                 int index = s1.indexOf("transaction id : ");
-                index = Integer.parseInt(s1.substring(index + 17));
-                inMap.put(index, "linktest");
-                inLineMap.put(index, i + 1);
+                long indexLong = Long.parseLong(s1.substring(index + 17));
+                inMap.put(indexLong, "linktest");
+                inLineMap.put(indexLong, i + 1);
                 String s = list.get(i - 1);
 
                 String substring = s.substring(s.indexOf("[") + 1, s.indexOf("]"));
                 LocalDateTime inTime = LocalDateTime.parse(substring, dateTimeFormatter);
-                inTimeMap.put(index, inTime);
+                inTimeMap.put(indexLong, inTime);
 
             } else if (s1.contains("sent message :receive linktest.rsp")) {
                 int index = s1.indexOf("transaction id : ");
-                index = Integer.parseInt(s1.substring(index + 17));
-                outMap.put(index, "linktest");
-                outLineMap.put(index, i + 1);
+                long indexLong = Long.parseLong(s1.substring(index + 17));
+                outMap.put(indexLong, "linktest");
+                outLineMap.put(indexLong, i + 1);
 
                 String s = s1;
 
                 String substring = s.substring(s.indexOf("[") + 1, s.indexOf("]"));
                 LocalDateTime inTime = LocalDateTime.parse(substring, dateTimeFormatter);
-                outTimeMap.put(index, inTime);
+                outTimeMap.put(indexLong, inTime);
             } else if (s1.contains("[EquipmentEventDealer] response msg has received to")) {
                 String s = s1;
 
                 int index = s1.indexOf("transaction id : ");
                 s1 = s1.substring(index + 17);
-                index = Integer.parseInt(s1.substring(0, s1.indexOf(" ")));
+                long indexLong = Long.parseLong(s1.substring(0, s1.indexOf(" ")));
                 s1 = s1.substring(s1.lastIndexOf(":") + 1, s1.length() - 3);
-                outMap.put(index, s1);
-                outLineMap.put(index, i + 1);
+                outMap.put(indexLong, s1);
+                outLineMap.put(indexLong, i + 1);
 
 
                 String substring = s.substring(s.indexOf("[") + 1, s.indexOf("]"));
                 LocalDateTime inTime = LocalDateTime.parse(substring, dateTimeFormatter);
-                outTimeMap.put(index, inTime);
+                outTimeMap.put(indexLong, inTime);
             }
 
 
@@ -138,9 +138,14 @@ public class S9F9Parse3 {
         errorHead.add("回复消息时间");
         errorHead.add("时间差");
         errorResult.add(errorHead);
-
-
-        inMap.forEach((x, y) -> {
+        List<TimeSort> timeSortList = new ArrayList<>();
+        inTimeMap.forEach((x, y) -> {
+            timeSortList.add(new TimeSort(x, y));
+        });
+        Collections.sort(timeSortList);
+        for (TimeSort timeSort : timeSortList) {
+            long x = timeSort.id;
+            String y = inMap.get(x);
             System.out.println(x);
             List<String> temp = new ArrayList<>();
             temp.add(x + "");//事务ID
@@ -162,9 +167,7 @@ public class S9F9Parse3 {
                 }
             }
             result.add(temp);
-
-        });
-
+        }
         Workbook sheets = ExcelWriter.exportDataForStr(result);
         sheets.write(FileUtils.openOutputStream(new File("C:\\Users\\Administrator\\Desktop\\消息分析.xlsx")));
         sheets = ExcelWriter.exportDataForStr(errorResult);
@@ -172,6 +175,29 @@ public class S9F9Parse3 {
 
         System.out.println("");
 
+    }
+
+    static class TimeSort implements Comparable<TimeSort> {
+        public long id;
+
+        public LocalDateTime time;
+
+        public TimeSort(long id, LocalDateTime time) {
+            this.id = id;
+            this.time = time;
+        }
+
+        @Override
+        public int compareTo(TimeSort o) {
+            if (o.time.equals(time)) {
+                if (id - o.id > 0) {
+                    return -1;
+                }
+            } else if (o.time.isAfter(time)) {
+                return -1;
+            }
+            return 1;
+        }
     }
 
 }
