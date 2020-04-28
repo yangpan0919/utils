@@ -24,7 +24,7 @@ public class ReLinkParse {
 
 
         String path = "E:\\application\\WeChat\\WeChat Files\\WeChat Files\\yangpan0919\\FileStorage\\File\\2020-04\\";
-        String name = "新建文本文档.txt";
+        String name = "D1600-0083host.log.2";
         File file = new File(path + name);
 
 
@@ -86,7 +86,7 @@ public class ReLinkParse {
         LocalDateTime localDateTime = startOnTimeList.get(startOnTimeList.size() - 1);
 
         //时间相差20秒以上则表示是重连，不是一开始就连上去的
-        LocalDateTime startTime = localDateTime.plusMinutes(20);
+        LocalDateTime startTime = localDateTime.plusSeconds(20);
         if (startTime.isAfter(time)) {
             return false;
         }

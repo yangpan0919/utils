@@ -16,7 +16,7 @@ public class S9F9Parse3 {
     public static void main(String[] args) throws Exception {
 
         String path = "E:\\application\\WeChat\\WeChat Files\\WeChat Files\\yangpan0919\\FileStorage\\File\\2020-04\\";
-        String name = "D1600-0083host.log.2";
+        String name = "D1500-0036host.log.4";
         File file = new File(path + name);
 
 
@@ -49,19 +49,30 @@ public class S9F9Parse3 {
 
         for (int i = 0; i < list.size(); i++) {
             String s1 = list.get(i);
-            if (s1.endsWith(" W input")) {
-                s1 = s1.substring(0, s1.indexOf(" "));
-                String s = list.get(i - 1);
-                int index = s.indexOf("transactionId = ");
-                String substring1 = s.substring(index + 16);
-                long indexLong = Long.parseLong(substring1.substring(0, substring1.indexOf(" ")));
-                inMap.put(indexLong, s1);
-                inLineMap.put(indexLong, i + 1);
-                String substring = s.substring(s.indexOf("[") + 1, s.indexOf("]"));
-                LocalDateTime inTime = LocalDateTime.parse(substring, dateTimeFormatter);
-                inTimeMap.put(indexLong, inTime);
-
-
+            if (s1.endsWith(" input")) {
+                boolean flag = false;
+                if (s1.endsWith(" W input")) {
+                    flag = true;
+                } else {
+                    String f = s1.substring(s1.indexOf("F") + 1);
+                    String substring = f.substring(0, f.indexOf(" "));
+                    int temp = Integer.parseInt(substring);
+                    if (temp % 2 == 1) {
+                        flag = true;
+                    }
+                }
+                if (flag) {
+                    s1 = s1.substring(0, s1.indexOf(" "));
+                    String s = list.get(i - 1);
+                    int index = s.indexOf("transactionId = ");
+                    String substring1 = s.substring(index + 16);
+                    long indexLong = Long.parseLong(substring1.substring(0, substring1.indexOf(" ")));
+                    inMap.put(indexLong, s1);
+                    inLineMap.put(indexLong, i + 1);
+                    String substring = s.substring(s.indexOf("[") + 1, s.indexOf("]"));
+                    LocalDateTime inTime = LocalDateTime.parse(substring, dateTimeFormatter);
+                    inTimeMap.put(indexLong, inTime);
+                }
             } else if ("S9F9 input".equals(s1)) {
 
                 String s = list.get(i - 1);
@@ -191,7 +202,7 @@ public class S9F9Parse3 {
         public int compareTo(TimeSort o) {
             if (o.time.equals(time)) {
                 if (id - o.id > 0) {
-                    return -1;
+                    return 1;
                 }
             } else if (o.time.isAfter(time)) {
                 return -1;
