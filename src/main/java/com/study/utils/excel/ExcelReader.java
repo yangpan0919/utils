@@ -28,6 +28,7 @@ public class ExcelReader {
 
     private static final String XLS = "xls";
     private static final String XLSX = "xlsx";
+
     public static final int headType = 2; //0-->把表头当做内容输出 ,1-->不需要表头 ，2-->表头做输出文件表头
 
     public static final int heandRowNum = 2; //表头行数

@@ -113,7 +113,7 @@ public class ExcelWriter {
         workbook = new SXSSFWorkbook();
 
         // 如需生成xls的Excel，请使用下面的工作簿对象，注意后续输出时文件后缀名也需更改为xls
-        //Workbook workbook = new HSSFWorkbook();
+//        workbook = new HSSFWorkbook();
 
         // 生成Sheet表，写入第一行的列头
         sheet = buildDataSheet(workbook);
