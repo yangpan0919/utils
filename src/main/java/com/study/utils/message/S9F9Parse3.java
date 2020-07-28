@@ -15,8 +15,8 @@ public class S9F9Parse3 {
 
     public static void main(String[] args) throws Exception {
 
-        String path = "E:\\application\\WeChat\\WeChat Files\\WeChat Files\\yangpan0919\\FileStorage\\File\\2020-04\\";
-        String name = "D1500-0036host.log.4";
+        String path = "E:\\application\\WeChat\\WeChat Files\\WeChat Files\\yangpan0919\\FileStorage\\File\\2020-05\\";
+        String name = "D3500-6054host.log";
         File file = new File(path + name);
 
 
