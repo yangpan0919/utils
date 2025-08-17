@@ -214,10 +214,10 @@ public class SerialProxyServer {
                 outputStream.write(buffer, 0, bytesRead);
                 outputStream.flush();
 
-                log.info("{} 转发数据: {} 字节", direction, bytesRead);
+//                log.info("{} 转发数据: {} 字节", direction, bytesRead);
 
 
-                Thread.sleep(10); // 短暂休眠避免CPU占用过高
+//                Thread.sleep(10); // 短暂休眠避免CPU占用过高
 
             } catch (IOException e) {
                 if (running) {
@@ -255,10 +255,10 @@ public class SerialProxyServer {
                 outputStream.write(buffer, 0, bytesRead);
                 outputStream.flush();
 
-                log.info("{} 转发数据: {} 字节", direction, bytesRead);
+//                log.info("{} 转发数据: {} 字节", direction, bytesRead);
 
 
-                Thread.sleep(10); // 短暂休眠避免CPU占用过高
+//                Thread.sleep(10); // 短暂休眠避免CPU占用过高
 
             } catch (IOException e) {
                 if (running) {
