@@ -9,14 +9,13 @@
         <relativePath/>
     </parent>
     <groupId>com.example</groupId>
-    <artifactId>tcp-proxy</artifactId>
+    <artifactId>serial-proxy</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>tcp-proxy</name>
-    <description>TCP Proxy with logging</description>
+    <name>serial-proxy</name>
+    <description>Serial Port Proxy with logging</description>
     
     <properties>
         <java.version>1.8</java.version>
-        <netty.version>4.1.86.Final</netty.version>
         <logback.version>1.2.11</logback.version>
     </properties>
     
@@ -27,9 +26,15 @@
         </dependency>
         
         <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <version>${netty.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        
+        <!-- 串口通信依赖 -->
+        <dependency>
+            <groupId>com.fazecast</groupId>
+            <artifactId>jSerialComm</artifactId>
+            <version>2.9.3</version>
         </dependency>
         
         <dependency>

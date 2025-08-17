@@ -28,13 +28,13 @@
     
     <!-- 消息日志专用输出 -->
     <appender name="MESSAGE_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>logs/tcp-messages.log</file>
+        <file>logs/serial-messages.log</file>
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} - %msg%n</pattern>
             <charset>UTF-8</charset>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>logs/tcp-messages.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <fileNamePattern>logs/serial-messages.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
             <maxFileSize>10MB</maxFileSize>
             <maxHistory>30</maxHistory>
             <totalSizeCap>1GB</totalSizeCap>
@@ -42,7 +42,7 @@
     </appender>
     
     <!-- 为消息处理器创建一个特殊的logger -->
-    <logger name="com.example.tcpproxy.handler" level="INFO" additivity="false">
+    <logger name="com.example.serialproxy.server" level="INFO" additivity="false">
         <appender-ref ref="MESSAGE_FILE"/>
         <appender-ref ref="CONSOLE"/>
     </logger>

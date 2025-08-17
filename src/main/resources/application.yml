@@ -1,22 +1,32 @@
 spring:
   application:
-    name: tcp-proxy
+    name: serial-proxy
   main:
     allow-bean-definition-overriding: true
 
-# 代理配置
+# 串口代理配置
 proxy:
-  # 本地服务器监听端口
-  localPort: 26000
-  # 远程服务器地址
-  remoteHost: 127.0.0.2
-  # 远程服务器端口
-  remotePort: 44818
+  # 源串口配置
+  sourcePort:
+    portName: "COM5"
+    baudRate: 9600
+    dataBits: 8
+    stopBits: 1
+    parity: 0
+    flowControl: 0
+  # 目标串口配置
+  targetPort:
+    portName: "COM11"
+    baudRate: 9600
+    dataBits: 8
+    stopBits: 1
+    parity: 0
+    flowControl: 0
 
 # 日志配置
 logging:
   level:
     root: INFO
-    com.example.tcpproxy: DEBUG
+    com.example.serialproxy: DEBUG
   file:
-    name: logs/tcp-proxy.log 
+    name: logs/serial-proxy.log 
