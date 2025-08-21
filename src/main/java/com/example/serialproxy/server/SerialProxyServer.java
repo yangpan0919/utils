@@ -192,7 +192,7 @@ public class SerialProxyServer {
     }
 
     private void forwardData1(String direction) {
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[10240];
         InputStream inputStream = sourcePort.getInputStream();
         OutputStream outputStream = targetPort.getOutputStream();
         while (running && sourcePort.isOpen() && targetPort.isOpen()) {
@@ -210,9 +210,24 @@ public class SerialProxyServer {
                 // 记录接收到的数据
                 logDataReceived(direction, buffer, bytesRead);
 
-                // 转发数据到目标串口
-                outputStream.write(buffer, 0, bytesRead);
-                outputStream.flush();
+                System.arraycopy(buffer, 0, buffer1, index1, bytesRead);
+
+                index1 += bytesRead;
+
+                if (index1 > 2) {
+                    byte b1 = buffer1[index1 - 2];
+                    byte b2 = buffer1[index1 - 1];
+                    if (b1 == 0x0D && b2 == 0x0A) {
+                        //转发数据
+                        // 转发数据到目标串口
+                        logDataReceived("1-->" + direction + "发送", buffer1, index1);
+                        outputStream.write(buffer1, 0, index1);
+                        outputStream.flush();
+                        index1 = 0;
+                        continue;
+
+                    }
+                }
 
 //                log.info("{} 转发数据: {} 字节", direction, bytesRead);
 
@@ -232,13 +247,22 @@ public class SerialProxyServer {
         }
     }
 
+
+    private int index1 = 0;
+
+    byte[] buffer1 = new byte[10240];
+
+
+    private int index2 = 0;
+
+    byte[] buffer2 = new byte[10240];
+
     private void forwardData2(String direction) {
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[10240];
         InputStream inputStream = targetPort.getInputStream();
         OutputStream outputStream = sourcePort.getOutputStream();
         while (running && sourcePort.isOpen() && targetPort.isOpen()) {
             try {
-
 //                while (true) {
 //                    int bytesRead = inputStream.available();
 //                    if (bytesRead > 0) {
@@ -251,9 +275,25 @@ public class SerialProxyServer {
                 // 记录接收到的数据
                 logDataReceived(direction, buffer, bytesRead);
 
-                // 转发数据到目标串口
-                outputStream.write(buffer, 0, bytesRead);
-                outputStream.flush();
+                System.arraycopy(buffer, 0, buffer2, index2, bytesRead);
+
+                index2 += bytesRead;
+
+                if (index2 > 2) {
+                    byte b1 = buffer2[index2 - 2];
+                    byte b2 = buffer2[index2 - 1];
+                    if (b1 == 0x0D && b2 == 0x0A) {
+                        //转发数据
+                        // 转发数据到目标串口
+                        logDataReceived("2-->" + direction + "发送：", buffer2, index2);
+                        outputStream.write(buffer2, 0, index2);
+                        outputStream.flush();
+                        index2 = 0;
+                        continue;
+
+                    }
+                }
+
 
 //                log.info("{} 转发数据: {} 字节", direction, bytesRead);
 
