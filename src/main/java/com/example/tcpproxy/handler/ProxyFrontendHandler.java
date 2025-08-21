@@ -1,5 +1,6 @@
 package com.example.tcpproxy.handler;
 
+import com.example.tcpproxy.TcpProxyApplication;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -15,41 +16,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public class ProxyFrontendHandler extends ChannelInboundHandlerAdapter {
 
-    private final Bootstrap bootstrap;
     private final ProxyConfig proxyConfig;
-    private Channel outboundChannel;
-    ProxyBackendHandler proxyBackendHandler;
     private static final AtomicInteger clientCounter = new AtomicInteger(0);
     private final int clientId;
 
     public ProxyFrontendHandler(Bootstrap bootstrap, ProxyConfig proxyConfig) {
-        this.bootstrap = bootstrap;
         this.proxyConfig = proxyConfig;
         this.clientId = clientCounter.incrementAndGet();
-        proxyBackendHandler = new ProxyBackendHandler(null, clientId);
-        // 连接到目标服务器
-        bootstrap.handler(new ChannelInitializer<Channel>() {
-            @Override
-            protected void initChannel(Channel ch) {
-                ch.pipeline().addLast(proxyBackendHandler);
-                ch.pipeline().addLast(new MessageEncoder());
-            }
-        });
-
-        ChannelFuture f = bootstrap.connect(proxyConfig.getRemoteHost(), proxyConfig.getRemotePort());
-        outboundChannel = f.channel();
-
-        f.addListener((ChannelFutureListener) future -> {
-            if (future.isSuccess()) {
-                // 连接成功，开始读取数据
-                log.info("客户端({})已连接到目标服务器: {}:{}", clientId, proxyConfig.getRemoteHost(), proxyConfig.getRemotePort());
-//                inboundChannel.read();
-            } else {
-                // 连接失败，关闭入站连接
-                log.error("客户端({})连接目标服务器失败: {}:{}", clientId, proxyConfig.getRemoteHost(), proxyConfig.getRemotePort(), future.cause());
-//                inboundChannel.close();
-            }
-        });
 
     }
 
@@ -58,7 +31,7 @@ public class ProxyFrontendHandler extends ChannelInboundHandlerAdapter {
         final Channel inboundChannel = ctx.channel();
 
         log.info("客户端({})已连接: {}", clientId, inboundChannel.remoteAddress());
-        proxyBackendHandler.setInboundChannel(inboundChannel);
+        TcpProxyApplication.proxyBackendHandler.setInboundChannel(inboundChannel);
 
     }
 
@@ -68,7 +41,7 @@ public class ProxyFrontendHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        if (outboundChannel.isActive()) {
+        if (TcpProxyApplication.outboundChannel.isActive()) {
             if (msg instanceof ByteBuf) {
                 ByteBuf buf = (ByteBuf) msg;
 
@@ -110,7 +83,7 @@ public class ProxyFrontendHandler extends ChannelInboundHandlerAdapter {
                         System.arraycopy(buffer1, 0, bytes1, 0, index1);
 
                         log.info("开始发送数据：" + Arrays.toString(bytes1));
-                        outboundChannel.writeAndFlush(bytes1).addListener((ChannelFutureListener) future -> {
+                        TcpProxyApplication.outboundChannel.writeAndFlush(bytes1).addListener((ChannelFutureListener) future -> {
 //                            if (future.isSuccess()) {
 //                                ctx.channel().read();
 //                            } else {
@@ -137,23 +110,11 @@ public class ProxyFrontendHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
         log.info("客户端({})断开连接: {}", clientId, ctx.channel().remoteAddress());
-        if (outboundChannel != null) {
-            closeOnFlush(outboundChannel);
-        }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         log.error("前端处理器({})异常", clientId, cause);
-        closeOnFlush(ctx.channel());
     }
 
-    /**
-     * 刷新所有挂起的消息并关闭通道
-     */
-    private static void closeOnFlush(Channel ch) {
-        if (ch.isActive()) {
-            ch.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(ChannelFutureListener.CLOSE);
-        }
-    }
 }
