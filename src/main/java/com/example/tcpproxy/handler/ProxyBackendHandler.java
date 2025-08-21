@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ProxyBackendHandler extends ChannelInboundHandlerAdapter {
 
-    private final Channel inboundChannel;
+    private Channel inboundChannel;
     private final int clientId;
 
     public ProxyBackendHandler(Channel inboundChannel, int clientId) {
@@ -20,6 +20,9 @@ public class ProxyBackendHandler extends ChannelInboundHandlerAdapter {
         this.clientId = clientId;
     }
 
+    public void setInboundChannel(Channel inboundChannel) {
+        this.inboundChannel = inboundChannel;
+    }
 
     byte[] buffer1 = new byte[102400];
 

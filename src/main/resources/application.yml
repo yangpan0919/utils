@@ -7,11 +7,11 @@ spring:
 # 代理配置
 proxy:
   # 本地服务器监听端口
-  localPort: 26000
+  localPort: 12289
   # 远程服务器地址
-  remoteHost: 127.0.0.1
+  remoteHost: 192.168.89.1
   # 远程服务器端口
-  remotePort: 44818
+  remotePort: 12289
 
 # 日志配置
 logging:

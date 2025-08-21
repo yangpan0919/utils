@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.example.tcpproxy.config.ProxyConfig;
 
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
@@ -17,6 +18,7 @@ public class ProxyFrontendHandler extends ChannelInboundHandlerAdapter {
     private final Bootstrap bootstrap;
     private final ProxyConfig proxyConfig;
     private Channel outboundChannel;
+    ProxyBackendHandler proxyBackendHandler;
     private static final AtomicInteger clientCounter = new AtomicInteger(0);
     private final int clientId;
 
@@ -24,19 +26,12 @@ public class ProxyFrontendHandler extends ChannelInboundHandlerAdapter {
         this.bootstrap = bootstrap;
         this.proxyConfig = proxyConfig;
         this.clientId = clientCounter.incrementAndGet();
-    }
-
-    @Override
-    public void channelActive(ChannelHandlerContext ctx) {
-        final Channel inboundChannel = ctx.channel();
-
-        log.info("客户端({})已连接: {}", clientId, inboundChannel.remoteAddress());
-
+        proxyBackendHandler = new ProxyBackendHandler(null, clientId);
         // 连接到目标服务器
         bootstrap.handler(new ChannelInitializer<Channel>() {
             @Override
             protected void initChannel(Channel ch) {
-                ch.pipeline().addLast(new ProxyBackendHandler(inboundChannel, clientId));
+                ch.pipeline().addLast(proxyBackendHandler);
                 ch.pipeline().addLast(new MessageEncoder());
             }
         });
@@ -55,6 +50,16 @@ public class ProxyFrontendHandler extends ChannelInboundHandlerAdapter {
 //                inboundChannel.close();
             }
         });
+
+    }
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) {
+        final Channel inboundChannel = ctx.channel();
+
+        log.info("客户端({})已连接: {}", clientId, inboundChannel.remoteAddress());
+        proxyBackendHandler.setInboundChannel(inboundChannel);
+
     }
 
     byte[] buffer1 = new byte[102400];
@@ -100,11 +105,11 @@ public class ProxyFrontendHandler extends ChannelInboundHandlerAdapter {
                     if (b1 == 0x0D && b2 == 0x0A) {
                         //转发数据
                         // 转发数据到目标串口
-                        log.info("开发发送数据");
                         byte[] bytes1 = new byte[index1];
 
                         System.arraycopy(buffer1, 0, bytes1, 0, index1);
 
+                        log.info("开始发送数据：" + Arrays.toString(bytes1));
                         outboundChannel.writeAndFlush(bytes1).addListener((ChannelFutureListener) future -> {
 //                            if (future.isSuccess()) {
 //                                ctx.channel().read();
@@ -151,4 +156,4 @@ public class ProxyFrontendHandler extends ChannelInboundHandlerAdapter {
             ch.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(ChannelFutureListener.CLOSE);
         }
     }
-} 
+}
