@@ -29,7 +29,7 @@ public class ProxyFrontendHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         final Channel inboundChannel = ctx.channel();
-        
+
         log.info("客户端({})已连接: {}", clientId, inboundChannel.remoteAddress());
 
         // 连接到目标服务器
@@ -37,42 +37,47 @@ public class ProxyFrontendHandler extends ChannelInboundHandlerAdapter {
             @Override
             protected void initChannel(Channel ch) {
                 ch.pipeline().addLast(new ProxyBackendHandler(inboundChannel, clientId));
+                ch.pipeline().addLast(new MessageEncoder());
             }
         });
 
         ChannelFuture f = bootstrap.connect(proxyConfig.getRemoteHost(), proxyConfig.getRemotePort());
         outboundChannel = f.channel();
-        
+
         f.addListener((ChannelFutureListener) future -> {
             if (future.isSuccess()) {
                 // 连接成功，开始读取数据
                 log.info("客户端({})已连接到目标服务器: {}:{}", clientId, proxyConfig.getRemoteHost(), proxyConfig.getRemotePort());
-                inboundChannel.read();
+//                inboundChannel.read();
             } else {
                 // 连接失败，关闭入站连接
                 log.error("客户端({})连接目标服务器失败: {}:{}", clientId, proxyConfig.getRemoteHost(), proxyConfig.getRemotePort(), future.cause());
-                inboundChannel.close();
+//                inboundChannel.close();
             }
         });
     }
+
+    byte[] buffer1 = new byte[102400];
+
+    int index1 = 0;
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         if (outboundChannel.isActive()) {
             if (msg instanceof ByteBuf) {
                 ByteBuf buf = (ByteBuf) msg;
-                
+
                 // 打印字节内容 - 十六进制格式
                 int readableBytes = buf.readableBytes();
                 byte[] bytes = new byte[readableBytes];
                 int readerIndex = buf.readerIndex();
                 buf.getBytes(readerIndex, bytes);
-                
+
                 StringBuilder hexDump = new StringBuilder();
                 for (byte b : bytes) {
                     hexDump.append(String.format("%02X ", b));
                 }
-                
+
                 // 尝试转换为字符串
                 String strContent;
                 try {
@@ -80,20 +85,47 @@ public class ProxyFrontendHandler extends ChannelInboundHandlerAdapter {
                 } catch (Exception e) {
                     strContent = "[无法转换为UTF-8字符串]";
                 }
-                
-                log.info("客户端({}) -> 服务端: 长度={}, 十六进制={}, 字符串={}", 
-                    clientId, readableBytes, hexDump.toString(), strContent);
+
+                log.info("客户端({}) -> 服务端: 长度={}, 十六进制={}, 字符串={}",
+                        clientId, readableBytes, hexDump.toString(), strContent);
+
+
+                System.arraycopy(bytes, 0, buffer1, index1, readableBytes);
+
+                index1 += readableBytes;
+
+                if (index1 > 2) {
+                    byte b1 = buffer1[index1 - 2];
+                    byte b2 = buffer1[index1 - 1];
+                    if (b1 == 0x0D && b2 == 0x0A) {
+                        //转发数据
+                        // 转发数据到目标串口
+                        log.info("开发发送数据");
+                        byte[] bytes1 = new byte[index1];
+
+                        System.arraycopy(buffer1, 0, bytes1, 0, index1);
+
+                        outboundChannel.writeAndFlush(bytes1).addListener((ChannelFutureListener) future -> {
+//                            if (future.isSuccess()) {
+//                                ctx.channel().read();
+//                            } else {
+//                                future.channel().close();
+//                            }
+                        });
+                        index1 = 0;
+                        return;
+
+                    }
+                }
+
+
             } else {
                 log.info("客户端({}) -> 服务端: {} (非ByteBuf类型)", clientId, msg);
             }
-            
-            outboundChannel.writeAndFlush(msg).addListener((ChannelFutureListener) future -> {
-                if (future.isSuccess()) {
-                    ctx.channel().read();
-                } else {
-                    future.channel().close();
-                }
-            });
+
+
+        } else {
+            log.warn("下层未连接就收到数据");
         }
     }
 

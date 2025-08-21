@@ -9,7 +9,7 @@ proxy:
   # 本地服务器监听端口
   localPort: 26000
   # 远程服务器地址
-  remoteHost: 127.0.0.2
+  remoteHost: 127.0.0.1
   # 远程服务器端口
   remotePort: 44818
 
