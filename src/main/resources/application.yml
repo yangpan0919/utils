@@ -23,10 +23,32 @@ proxy:
     parity: 0
     flowControl: 0
 
+# TCP服务端配置
+tcp:
+  server:
+    enabled: true
+    port: 12290
+    # 接收的固定字节数据配置
+    receiveData:
+      - name: "数据包1"
+        hexData: "30 31 57 52 44 44 30 31 31 31 31 2C 31 0D 0A"
+        enabled: true
+      - name: "数据包2"
+        hexData: "AA BB CC DD 30 30 37 30 0D 0A"
+        enabled: true
+    # 发送的固定字节数据配置
+    sendData:
+      - name: "数据包1"
+        hexData: "31 31 4F 4B 30 30 37 30 0D 0A"
+        enabled: true
+      - name: "数据包2"
+        hexData: "EE FF 00 11"
+        enabled: true
+
 # 日志配置
 logging:
   level:
     root: INFO
-    com.example.serialproxy: DEBUG
+    com.example.tcpproxy: DEBUG
   file:
-    name: logs/serial-proxy.log 
+    name: logs/tcp-proxy.log 

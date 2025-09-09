@@ -42,7 +42,7 @@
     </appender>
     
     <!-- 为消息处理器创建一个特殊的logger -->
-    <logger name="com.example.serialproxy.server" level="INFO" additivity="false">
+    <logger name="com.example.tcpproxy.server" level="INFO" additivity="false">
         <appender-ref ref="MESSAGE_FILE"/>
         <appender-ref ref="CONSOLE"/>
     </logger>
